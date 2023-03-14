@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+    <main>
+        <div class="d-flex align-items-center justify-content-center flex-column">
+            {% if request.user.id == specialist.user_id %}
+                <h2>Your schedule for {{ day }} {{ month }} {{ year }}</h2>
+            {% else %}
+                <h2>{{ specialist.name }}'s schedule for {{ day }} {{ month }} {{ year }}</h2>
+            {% endif %}
+            {% if events %}
+                <div class="card" style="width: 18rem;">
+                    <ul class="list-group list-group-flush">
+                      {% for event in events %}
+                          {% if request.user.id == specialist.user_id %}
+                              <li class="list-group-item">{{ event.client }}, {{ event.date }} {{ event.start_time }} - {{ event.end_time }}</li>
+                          {% else %}
+                              <li class="list-group-item">{{ event.date }} {{ event.start_time }} - {{ event.end_time }}</li>
+                          {% endif %}
+                      {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <p>There is no events for this date, you free to choose any in range of working hours!</p>
+            {% endif %}
+            {% if request.user.is_client or request.user.is_worker and request.user.worker.user_id == specialist.user_id %}
+                <a class="btn btn-outline-dark mt-2" href="{% url 'create-event' specialist.user_id date  %}">Create new event</a>
+            {% endif %}
+        </div>
+    </main>
+f
+{% endblock content %}

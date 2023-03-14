@@ -1,0 +1,23 @@
+{% extends 'core/base.html' %}
+
+<main>
+    {% block content %}
+        <div class="d-flex align-items-center justify-content-center flex-column p-2">
+            <div class="card text-bg-light mb-3" style="max-width: 18rem;">
+                {% if 'created' in notification.content %}
+                    <div class="card-header">Creation Notification</div>
+                {% elif 'changed' in notification.content %}
+                    <div class="card-header">Changing Notification</div>
+                {% elif 'approved' in notification.content %}
+                    <div class="card-header">Approval Notification</div>
+                {% elif 'deleted' in notification.content %}
+                    <div class="card-header">Deleting Notification</div>
+                {% endif %}
+              <div class="card-body">
+                <small>{{ notification.timestamp }}</small>
+                <p class="card-text">{{ notification.content }}</p>
+              </div>
+            </div>
+        </div>
+    {% endblock %}
+</main>

@@ -1,0 +1,21 @@
+{% extends "core/base.html" %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
+{% block content %}
+
+    <main>
+        <div class="d-flex align-items-center justify-content-center flex-column">
+            <p class="display-6">Who are you ?</p>
+            <div>
+                <a type="button" class="btn btn-outline-dark" href="{% url 'client-signup' %}">I am client</a>
+                <a type="button" class="btn btn-outline-dark" href="{% url 'worker-signup' %}">I am worker</a>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}
+

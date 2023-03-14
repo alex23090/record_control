@@ -1,0 +1,55 @@
+{% load crispy_forms_tags %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}">Record Control</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link{% if request.path == '/' %} active{% endif %}" aria-current="page" href="{% url 'home' %}">Home</a>
+        </li>
+        {% if request.user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'account' %}">Account</a>
+            </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Events
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <li><a class="dropdown-item" href="{% url 'events-list' %}">All Events</a></li>
+                      {% if request.user.is_worker %}
+                          <li><a class="dropdown-item" href="{% url 'events-approval' %}">Events to approve</a></li>
+                      {% endif %}
+                      <li><a class="dropdown-item" href="{% url 'create-event' %}">Create new event</a></li>
+                    </ul>
+                </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'inbox' %}">Inbox<span class="badge bg-dark rounded-pill">{% if new_notifications != 0 %}{{ new_notifications }}{% endif %}</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'docs' %}">API</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'account_logout' %}">Logout</a>
+            </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'account_login' %}">Login/Sign Up</a>
+        </li>
+        {% endif %}
+      </ul>
+      <form class="d-flex" method="GET" action="">
+          {% csrf_token %}
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="searched" {% if searched %}value="{{ searched }}"{% endif %}>
+            {% if date_form %}
+                <input class="form-control me-2" type="date" name="date" {% if value_date %}value="{{ value_date }}"{% endif %}>
+            {% endif %}
+            <button class="btn btn-outline-dark" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>

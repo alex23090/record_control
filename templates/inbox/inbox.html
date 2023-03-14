@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main>
+    <div class="d-flex align-items-center justify-content-center flex-column">
+        {% if notifications %}
+            <form method="POST" action="" class="d-flex align-items-center flex-column">
+                {% csrf_token %}
+                <div class="list-group p-2">
+                    {% for n in notifications %}
+                        <div class="d-flex justify-content-between flex-row">
+                            <a href="{% url 'notification' n.id %}" class="list-group-item list-group-item-action" aria-current="true">
+                              <div class="d-flex w-100 justify-content-between">
+                                <small>{{ n.timestamp }}</small>
+                                <small>{% if n.is_read %}Read{% else %}New{% endif %}</small>
+                              </div>
+                                {% if n.content|length > 73 %}
+                                    <p class="mb-1">{{ n.content|slice:":73" }}...</p>
+                                {% else %}
+                                    <p class="mb-1">{{ n.content|slice:":73" }}</p>
+                                {% endif %}
+                            </a>
+                            <div class="d-flex align-items-center justify-content-center flex-column border p-2 text-decoration-none text-reset">
+                                <input class="form-check-input" type="checkbox" name="notification_id" value="{{ n.id }}">
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-outline-dark">Delete selected notifications</button>
+            </form>
+            {% if elided_range|length > 1 %}
+                <nav aria-label="Page navigation example" class="mt-2">
+                  <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not notifications.has_previous %}disabled{% endif %}">
+                      <a class="page-link" href="?page={% if notifications.has_previous %}{{ notifications.previous_page_number }}{% endif %}" tabindex="-1">Previous</a>
+                    </li>
+                    {% for page in elided_range %}
+                        <li class="page-item {% if notifications.number == page %}active{% endif %}"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                    {% endfor %}
+                    <li class="page-item {% if not notifications.has_next %}disabled{% endif %}">
+                      <a class="page-link" href="?page={% if notifications.has_next %}{{ notifications.next_page_number }}{% endif %}">Next</a>
+                    </li>
+                  </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <h1>Inbox page is empty for now!</h1>
+        {% endif %}
+    </div>
+</main>
+{% endblock content %}

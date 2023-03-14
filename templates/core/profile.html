@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+    <main>
+        <div class="d-flex align-items-center justify-content-between flex-column  m-2 p-2">
+            <img src="{{ profile.imageURL }}"
+                      alt="Generic placeholder image" class="img-fluid"
+                      style="width: 180px; border-radius: 10px;">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Name - {{ profile.name }}</li>
+                <li class="list-group-item">Username - {{ profile.username }}</li>
+                <li class="list-group-item">Email - {{ profile.email }}</li>
+                {% if profile.user.is_worker %}
+                    {% if profile.bio %}
+                        <li class="list-group-item">Bio - {{ profile.bio }}</li>
+                    {% endif %}
+                    <li class="list-group-item">Working hours - {{ schedule.start_time }} - {{ schedule.end_time }}</li>
+                {% endif %}
+            </ul>
+            {% if profile.user.is_worker %}
+                <a class="btn btn-outline-dark mt-2" href="{% url 'calendar' profile.user_id current_year current_month %}">Appointment schedule</a>
+            {% endif %}
+        </div>
+        <div>
+        </div>
+    </main>
+{% endblock content %}

@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main>
+    <div class="d-flex align-items-center justify-content-between flex-column  m-2 p-2">
+        <h1>Welcome back {% if request.user.is_worker %}worker{% endif %} {{ account.name }}, glad to see you!</h1>
+        <img src="{{ account.imageURL }}"
+                  alt="Generic placeholder image" class="img-fluid"
+                  style="width: 180px; border-radius: 10px;">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Name - {{ account.name }}</li>
+            <li class="list-group-item">Username - {{ account.username }}</li>
+            <li class="list-group-item">Email - {{ account.email }}</li>
+            {% if request.user.is_worker %}
+                {% if account.bio and request.user.is_worker %}
+                    <li class="list-group-item">Bio - {{ account.bio }}</li>
+                {% endif %}
+                <li class="list-group-item">Working hours - {{ schedule.start_time }} - {{ schedule.end_time }}</li>
+            {% endif %}
+        </ul>
+        {% if request.user.is_worker %}
+            <a class="btn btn-outline-dark mt-2" href="{% url 'calendar' account.user_id current_year current_month %}">Appointment Schedule</a>
+        {% endif %}
+        <a class="btn btn-outline-dark mt-2" href="{% url 'edit-account' %}">Edit account</a>
+    </div>
+</main>
+{% endblock content %}

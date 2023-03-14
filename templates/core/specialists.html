@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+    <main>
+         <div class="d-flex align-items-center justify-content-center flex-column">
+            {% if searched %}
+                <h2>You searched for {{ searched }}</h2>
+            {% else %}
+                <h1>Our specialists!</h1>
+            {% endif %}
+            <div class="wrapper" style="grid-template-columns: repeat(4, 1fr);">
+                {% for specialist in specialists %}
+                    <a href="{% url 'profile' specialist.user.id %}" class="m-1" style="text-decoration: none; color: black;">
+                        <div class="card d-flex align-items-center" style="width: 16rem;">
+                            <img class="card-img-top" src="{{ specialist.imageURL }}" alt="Card image cap" style="height: 20vw;object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ specialist.name }}</h5>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <br>
+        {% if elided_range|length > 1 %}
+            <nav aria-label="Page navigation example">
+              <ul class="pagination justify-content-center">
+                <li class="page-item {% if not specialists.has_previous %} disabled{% endif %}">
+                  <a class="page-link" href="?page={% if specialists.has_previous %}{{ specialists.previous_page_number }}{% endif %}" tabindex="-1">Previous</a>
+                </li>
+                {% for page in elided_range %}
+                    <li class="page-item {% if specialists.number == page %}active{% endif %}"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                {% endfor %}
+                <li class="page-item {% if not specialists.has_next %} disabled{% endif %}">
+                  <a class="page-link" href="?page={% if specialists.has_next %}{{ specialists.next_page_number }}{% endif %}">Next</a>
+                </li>
+              </ul>
+            </nav>
+        {% endif %}
+    </main>
+
+{% endblock content %}

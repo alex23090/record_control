@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="{% static 'styles/calendar.css' %}" rel="stylesheet">
+    </head>
+    <body>
+        <div class="month">
+          <ul>
+              <li class="prev"><a href="{% url 'calendar' specialist_id previous_year previous_month  %}" class="text-decoration-none text-white">&#10094;</a></li>
+              <li class="next"><a href="{% url 'calendar' specialist_id next_year next_month  %}" class="text-decoration-none text-white">&#10095;</a></li>
+            <li>
+              {{ month }}<br>
+              <span style="font-size:18px">{{ year }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <ul class="weekdays">
+          <li>Mo</li>
+          <li>Tu</li>
+          <li>We</li>
+          <li>Th</li>
+          <li>Fr</li>
+          <li>Sa</li>
+          <li>Su</li>
+        </ul>
+
+        <ul class="days">
+          {% for week in days %}
+              {% for day in week %}
+                {% if day == today and month == current_month and year == current_year %}
+                  <li><a href="{% url 'day' specialist_id year month day %}" class="text-decoration-none"><span class="active">{{ today }}</span></a></li>
+                {% elif day == 0 %}
+                    <li>&nbsp;</li>
+                {% else %}
+                  <li><a href="{% url 'day' specialist_id year month day %}" class="text-decoration-none text-dark">{{ day }}</a></li>
+                {% endif %}
+              {% endfor %}
+          {% endfor %}
+        </ul>
+
+    </body>
+</html>
+
+
+{% endblock content %}

@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main>
+    <div class="d-flex align-items-center justify-content-between flex-column">
+        <h1>Events for {{ request.user.first_name }}</h1>
+        {% if events %}
+            <div class="wrapper" style="grid-template-columns: repeat(4, 1fr);">
+            {% for event in events %}
+                <div class="card m-1">
+                    <div class="card-body d-flex flex-column justify-content-center" style="position: relative;">
+                        <a type="button" class="btn position-absolute top-0 end-0" href="{% url 'delete-event' event.id %}">&#10005;</a>
+                        <ul class="p-2" style="list-style: none;">
+                        {% if request.user.is_client %}
+                            <li><a href="{% url 'profile' event.worker.user_id %}" class="profile_link">Specialist - {{ event.worker }}</a></li>
+                        {% elif request.user.is_worker %}
+                            <li><a href="{% url 'profile' event.client.user_id %}" class="profile_link">{{ event.client }}</a></li>
+                        {% endif %}
+                            <li>Date: {{ event.date }}</li>
+                            <li>Time: {{ event.start_time }} - {{ event.end_time }}</li>
+                        {% if event.approved %}
+                            <li>Approved &#10003;</li>
+                        {% else %}
+                            <li>Event not approved yet &#10060;</li>
+                        {% endif %}
+                        </ul>
+                        <a type="button" class="btn btn btn-outline-dark" href="{% url 'update-event' event.id %}">Update</a>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+            {% if elided_range|length > 1 %}
+                <nav aria-label="Page navigation example">
+                  <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not events.has_previous %}disabled{% endif %}">
+                      <a class="page-link" href="?page={% if events.has_previous %}{{ events.previous_page_number }}{% endif %}" tabindex="-1">Previous</a>
+                    </li>
+                    {% for page in elided_range %}
+                        <li class="page-item {% if events.number == page %}active{% endif %}"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                    {% endfor %}
+                    <li class="page-item {% if not events.has_next %}disabled{% endif %}">
+                      <a class="page-link" href="?page={% if events.has_next %}{{ events.next_page_number }}{% endif %}">Next</a>
+                    </li>
+                  </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <p>Your events page is empty for now!</p>
+            <a type="button" class="btn btn btn-outline-dark" href="{% url 'create-event' %}">Create new event</a>
+        {% endif %}
+    </div>
+    <br>
+</main>
+{% endblock content %}

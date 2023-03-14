@@ -1,0 +1,23 @@
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.pagination > li > a:focus,
+.pagination > li > a:hover,
+.pagination > li > span:focus,
+.pagination > li > span:hover {
+    z-index: 3;
+    color: #ffff;
+    background-color: black;
+}
+
+.profile_link{
+    color: black;
+    text-decoration: none;
+}
+
+.profile_link:hover{
+    color: #888888;
+}
