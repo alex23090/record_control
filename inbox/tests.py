@@ -1,6 +1,8 @@
 from django.test import TestCase
+from django.urls import reverse, resolve
 from .models import Notification
 from core.models import User
+from .views import inbox, notification
 
 
 class NotificationTests(TestCase):
@@ -41,3 +43,14 @@ class NotificationTests(TestCase):
         self.assertEqual(notification.initiator, user_2)
         self.assertEqual(notification.receiver, user_1)
         self.assertEqual(notification.is_read, False)
+
+
+class TestUrls(TestCase):
+
+    def test_inbox_url(self):
+        url = reverse('inbox')
+        self.assertEqual(resolve(url).func, inbox)
+
+    def test_notification_url(self):
+        url = reverse('notification', args=['1'])
+        self.assertEqual(resolve(url).func, notification)

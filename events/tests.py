@@ -1,6 +1,9 @@
 from django.test import TestCase
+from django.urls import resolve, reverse
 from .models import Event
 from core.models import User, Worker, Client
+from .views import events, createEvent, deleteEvent, updateEvent, eventsApproval, timetable, calendarDay
+
 
 
 class EventsTests(TestCase):
@@ -68,3 +71,36 @@ class EventsTests(TestCase):
         self.assertEqual(event.date, '2043-03-03')
         self.assertEqual(event.start_time, '15:00')
         self.assertEqual(event.end_time, '16:00')
+
+
+class TestUrls(TestCase):
+
+    def test_event_list_url(self):
+        url = reverse('events-list')
+        self.assertEqual(resolve(url).func, events)
+
+    def test_create_event_url(self):
+        url = reverse('create-event')
+        self.assertEqual(resolve(url).func, createEvent)
+        url = reverse('create-event', args=['1', '03-03-2030'])
+        self.assertEqual(resolve(url).func, createEvent)
+
+    def test_update_event_url(self):
+        url = reverse('update-event', args=['1'])
+        self.assertEqual(resolve(url).func, updateEvent)
+
+    def test_delete_event_url(self):
+        url = reverse('delete-event', args=['1'])
+        self.assertEqual(resolve(url).func, deleteEvent)
+
+    def test_events_approval_url(self):
+        url = reverse('events-approval')
+        self.assertEqual(resolve(url).func, eventsApproval)
+
+    def test_calendar_url(self):
+        url = reverse('calendar', args=['1', '2024', '03'])
+        self.assertEqual(resolve(url).func, timetable)
+
+    def test_day_url(self):
+        url = reverse('day', args=['1', '2024', '03', '14'])
+        self.assertEqual(resolve(url).func, calendarDay)
