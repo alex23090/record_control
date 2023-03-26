@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.test import Client as Cl
 from .models import Client, Worker, Schedule, User
 from django.urls import reverse, resolve
 from .views import home, worker_register, client_register, account, editAccount, profileView
@@ -135,3 +136,62 @@ class TestUrls(TestCase):
     def test_profile_url(self):
         url = reverse('profile', args=['1'])
         self.assertEqual(resolve(url).func, profileView)
+
+
+class TestViews(TestCase):
+
+    def setUp(self):
+        self.client = Cl()
+        self.user = User.objects.create_user(
+            username='johndoe',
+            first_name='John Doe',
+            email='johndoe@gmail.com',
+            password='testpass123',
+            is_worker=True
+        )
+        self.worker = Worker.objects.create(
+            user=self.user,
+            name=self.user.first_name,
+            username=self.user.username,
+            email=self.user.email
+        )
+        self.client.login(username='johndoe', password='testpass123')
+
+
+
+    def test_home_get(self):
+        response = self.client.get(reverse('home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'core/specialists.html')
+
+    def test_worker_register_get(self):
+        response = self.client.get(reverse('worker-signup'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'account/worker_signup_form.html')
+
+    def test_client_register_get(self):
+        response = self.client.get(reverse('client-signup'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'account/client_signup_form.html')
+
+    def test_account(self):
+        response = self.client.get(reverse('account'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'core/account.html')
+
+    def test_edit_account_get(self):
+        response = self.client.get(reverse('edit-account'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'core/account_form.html')
+
+
+    def test_profile(self):
+        response = self.client.get(reverse('profile', args=[self.user.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'core/profile.html')

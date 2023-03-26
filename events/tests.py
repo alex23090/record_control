@@ -3,7 +3,7 @@ from django.urls import resolve, reverse
 from .models import Event
 from core.models import User, Worker, Client
 from .views import events, createEvent, deleteEvent, updateEvent, eventsApproval, timetable, calendarDay
-
+from django.test import Client as Cl
 
 
 class EventsTests(TestCase):
@@ -104,3 +104,90 @@ class TestUrls(TestCase):
     def test_day_url(self):
         url = reverse('day', args=['1', '2024', '03', '14'])
         self.assertEqual(resolve(url).func, calendarDay)
+
+
+class TestViews(TestCase):
+
+    def setUp(self):
+        self.client_browser = Cl()
+        self.user_1 = User.objects.create_user(
+            username='johndoe',
+            first_name='John Doe',
+            email='johndoe@gmail.com',
+            password='testpass123',
+            is_worker=True
+        )
+        self.worker = Worker.objects.create(
+            user=self.user_1,
+            name=self.user_1.first_name,
+            username=self.user_1.username,
+            email=self.user_1.email
+        )
+        self.user_2 = User.objects.create_user(
+            username='dennis',
+            first_name='Den Ivy',
+            email='denivy@gmail.com',
+            password='testpass123',
+            is_client=True
+        )
+
+        self.client = Client.objects.create(
+            user=self.user_2,
+            name=self.user_2.first_name,
+            username=self.user_2.username,
+            email=self.user_2.email
+        )
+
+        self.event = Event.objects.create(
+            client=self.client,
+            worker=self.worker,
+            date='2043-03-03',
+            start_time='16:00',
+            end_time='17:00'
+        )
+        self.client_browser.login(username='johndoe', password='testpass123')
+
+    def test_events(self):
+        response = self.client_browser.get(reverse('events-list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'events/events.html')
+
+    def test_create_event(self):
+        response = self.client_browser.get(reverse('create-event'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'events/event_form.html')
+
+        response = self.client_browser.get(reverse('create-event', args=[f'{self.user_1.id}', '03-03-2030']))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'events/event_form.html')
+
+    def test_update_event(self):
+        response = self.client_browser.get(reverse('update-event', args=[f'{self.event.id}']))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'events/event_form.html')
+
+    def test_delete_event(self):
+        response = self.client_browser.get(reverse('delete-event', args=[f'{self.event.id}']))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'events/delete-template.html')
+
+    def test_events_approval(self):
+        response = self.client_browser.get(reverse('events-approval'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'events/events-approval.html')
+
+    def test_timetable(self):
+        response = self.client_browser.get(reverse('calendar', args=[f'{self.user_1.id}', 2023, 'March']))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'events/calendar.html')
+
+    def test_calendarDay(self):
+        response = self.client_browser.get(reverse('day', args=[f'{self.user_1.id}', 2023, 'March', 3]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'events/day.html')
