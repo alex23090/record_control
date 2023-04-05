@@ -1,3 +1,4 @@
+from django import forms
 from django.forms import ModelForm
 from .models import User, Client, Worker
 from django.contrib.auth.forms import UserCreationForm
@@ -58,6 +59,10 @@ class ClientAccountForm(ModelForm):
     class Meta:
         model = Client
         fields = ['name', 'username', 'email', 'profile_image']
+        widgets = {
+            'name': forms.TextInput(attrs={'required': True}),
+            'username': forms.TextInput(attrs={'required': True}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(ClientAccountForm, self).__init__(*args, **kwargs)
@@ -69,6 +74,10 @@ class WorkerAccountForm(ModelForm):
     class Meta:
         model = Worker
         fields = ['name', 'username', 'email', 'profile_image', 'bio']
+        widgets = {
+            'name': forms.TextInput(attrs={'required': True}),
+            'username': forms.TextInput(attrs={'required': True}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(WorkerAccountForm, self).__init__(*args, **kwargs)
