@@ -4,9 +4,10 @@ from .models import Event
 from core.models import User, Worker, Client
 from .views import events, createEvent, deleteEvent, updateEvent, eventsApproval, timetable, calendarDay
 from django.test import Client as Cl
+from .forms import ClientEventForm, WorkerEventForm, DateForm
 
 
-class EventsTests(TestCase):
+class TestModels(TestCase):
 
     def test_create_event(self):
         user_1 = User.objects.create(
@@ -191,3 +192,69 @@ class TestViews(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'events/day.html')
+
+
+class TestForms(TestCase):
+
+    def setUp(self):
+        self.user_1 = User.objects.create_user(
+            username='johndoe',
+            first_name='John Doe',
+            email='johndoe@gmail.com',
+            password='testpass123',
+            is_worker=True
+        )
+        self.worker = Worker.objects.create(
+            user=self.user_1,
+            name=self.user_1.first_name,
+            username=self.user_1.username,
+            email=self.user_1.email
+        )
+        self.user_2 = User.objects.create_user(
+            username='dennis',
+            first_name='Den Ivy',
+            email='denivy@gmail.com',
+            password='testpass123',
+            is_client=True
+        )
+
+        self.client = Client.objects.create(
+            user=self.user_2,
+            name=self.user_2.first_name,
+            username=self.user_2.username,
+            email=self.user_2.email
+        )
+
+    def test_client_event_form_valid_data(self):
+        form = ClientEventForm(data={
+            'worker': self.worker.user,
+            'date': '2030-03-03',
+            'start_time': '08:00'
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_client_event_form_no_data(self):
+        form = ClientEventForm(data={})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 3)
+
+    def test_worker_event_form_valid_data(self):
+        form = WorkerEventForm(data={
+            'client': self.client.user,
+            'date': '2030-03-03',
+            'start_time': '08:00'
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_worker_event_form_no_data(self):
+        form = WorkerEventForm(data={})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 3)
+
+    def test_date_form_valid_data(self):
+        form = DateForm(data={'date': '2030-03-03'})
+        self.assertTrue(form.is_valid())
+
+    def test_date_form_no_data(self):
+        form = DateForm(data={})
+        self.assertTrue(form.is_valid())

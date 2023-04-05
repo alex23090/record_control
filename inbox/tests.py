@@ -6,7 +6,7 @@ from .views import inbox, notification
 from django.test import Client as Cl
 
 
-class NotificationTests(TestCase):
+class TestModels(TestCase):
 
     def test_create_notification(self):
         user_1 = User.objects.create(
