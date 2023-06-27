@@ -10,8 +10,8 @@ edited or deleted. Also every employee has their own schedule/calendar.
 ##### Table of Contents
 - [Installation](#installation)<br />
 - [Usage](#usage)<br />
-- [Used Technologies](#usedtechnologies)<br />
-- [Third Party Packages](#thirdpartypackages)<br /> 
+- [Used Technologies](#used-technologies)<br />
+- [Third Party Packages](#third-party-packages)<br /> 
 - [Contacts](#contacts)
 
 
