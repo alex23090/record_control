@@ -18,7 +18,7 @@ def home(request):
         specialists = Worker.objects.all().order_by('name')
 
     # Pagination
-    p = Paginator(specialists, 4)
+    p = Paginator(specialists, 3)
     page = request.GET.get('page')
     specialists = p.get_page(page)
     elided_range = list(p.get_elided_page_range())
@@ -35,6 +35,7 @@ def client_register(request):
     if request.method == 'POST':
         form = ClientSignUpForm(request.POST)
         if form.is_valid():
+            print(form.cleaned_data)
             user = form.save()
             user.save()
             messages.success(request, 'Client account was created!')
@@ -73,11 +74,14 @@ def account(request):
     current_year = datetime.now().year
     profile = None
     schedule = None
-    if request.user.is_client:
-        profile = Client.objects.get(user=request.user)
-    elif request.user.is_worker:
-        profile = Worker.objects.get(user=request.user)
-        schedule = profile.schedule_set.get()
+    try:
+        if request.user.is_client:
+            profile = Client.objects.get(user=request.user)
+        elif request.user.is_worker:
+            profile = Worker.objects.get(user=request.user)
+            schedule = profile.schedule_set.get()
+    except:
+        pass
     new = len(Notification.objects.filter(is_read=False, receiver=request.user.id))
     context = {'account': profile, 'schedule': schedule, 'current_year': current_year, 'current_month': current_month, 'new_notifications': new}
     return render(request, 'core/account.html', context)
@@ -86,26 +90,29 @@ def account(request):
 @login_required(login_url='/accounts/login/')
 def editAccount(request):
     form = None
-    if request.user.is_client:
-        account = request.user.client
-        form = ClientAccountForm(instance=account)
-        if request.method == 'POST':
-            form = ClientAccountForm(request.POST, request.FILES, instance=account)
-            if form.is_valid():
-                request.user.username = form.cleaned_data['username']
-                form.save()
-                messages.success(request, "Client account was successfully edited!")
-                return redirect('account')
-    elif request.user.is_worker:
-        account = request.user.worker
-        form = WorkerAccountForm(instance=account)
-        if request.method == 'POST':
-            form = WorkerAccountForm(request.POST, request.FILES, instance=account)
-            if form.is_valid():
-                request.user.username = form.cleaned_data['username']
-                form.save()
-                messages.success(request, "Worker account was successfully edited!")
-                return redirect('account')
+    try:
+        if request.user.is_client:
+            account = request.user.client
+            form = ClientAccountForm(instance=account)
+            if request.method == 'POST':
+                form = ClientAccountForm(request.POST, request.FILES, instance=account)
+                if form.is_valid():
+                    request.user.username = form.cleaned_data['username']
+                    form.save()
+                    messages.success(request, "Client account was successfully edited!")
+                    return redirect('account')
+        elif request.user.is_worker:
+            account = request.user.worker
+            form = WorkerAccountForm(instance=account)
+            if request.method == 'POST':
+                form = WorkerAccountForm(request.POST, request.FILES, instance=account)
+                if form.is_valid():
+                    request.user.username = form.cleaned_data['username']
+                    form.save()
+                    messages.success(request, "Worker account was successfully edited!")
+                    return redirect('account')
+    except:
+        pass
     new = len(Notification.objects.filter(is_read=False, receiver=request.user.id))
     context = {'form': form, 'new_notifications': new}
     return render(request, 'core/account_form.html', context)

@@ -107,7 +107,6 @@ def events(request):
             occasions = Event.objects.filter(client__user=request.user).order_by('date', 'start_time', '-approved')
     elif request.user.is_worker:
         if searched and d:
-            print('hi')
             occasions = Event.objects.filter(worker__user=request.user, date=d).filter(
                 Q(client__name__contains=searched)
                 | Q(client__username__contains=searched)).order_by('date', 'start_time', '-approved')
@@ -332,19 +331,19 @@ def updateEvent(request, pk):
 def deleteEvent(request, pk):
     event = Event.objects.get(id=pk)
 
-    if request.user.is_worker:
-        n = Notification.objects.create(
-            content=f"{event.worker.name} deleted an event on {event.date} at {event.start_time} - {event.end_time}",
-            initiator=event.worker.user, receiver=event.client.user)
-    elif request.user.is_client:
-        n = Notification.objects.create(
-            content=f"{event.client.name} deleted an event on {event.date} at {event.start_time} - {event.end_time}",
-            initiator=event.client.user, receiver=event.worker.user)
-
     if request.method == 'POST':
         event.delete()
+        if request.user.is_worker:
+            n = Notification.objects.create(
+                content=f"{event.worker.name} deleted an event on {event.date} at {event.start_time} - {event.end_time}",
+                initiator=event.worker.user, receiver=event.client.user)
+        elif request.user.is_client:
+            n = Notification.objects.create(
+                content=f"{event.client.name} deleted an event on {event.date} at {event.start_time} - {event.end_time}",
+                initiator=event.client.user, receiver=event.worker.user)
         messages.success(request, "Event was successfully deleted!")
         return redirect('events-list')
+
 
     new = len(Notification.objects.filter(is_read=False, receiver=request.user.id))
     context = {'event': event, 'new_notifications': new}
